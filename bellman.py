@@ -44,7 +44,6 @@ D.add_neighbor(C, 1)
 
 routers = [A, B, C, D]
 
-# Run DVR until convergence
 converged = False
 while not converged:
     converged = True
@@ -52,7 +51,7 @@ while not converged:
         if r.update_table():
             converged = False
 
-# Output
+
 print("=== Distance Vector Routing Tables ===")
 for r in routers:
     r.print_table()
