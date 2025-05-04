@@ -1,8 +1,8 @@
 class Router:
     def __init__(self, name):
         self.name = name
-        self.neighbors = {}  # neighbor: cost
-        self.routing_table = {name: (0, name)}  # destination: (cost, next_hop)
+        self.neighbors = {} 
+        self.routing_table = {name: (0, name)} 
 
     def add_neighbor(self, neighbor, cost):
         self.neighbors[neighbor] = cost
@@ -25,20 +25,20 @@ class Router:
             print("  To", dest, "via", next_hop, "cost:", cost)
         print()
 
-# Network Topology
+
 A = Router("A")
 B = Router("B")
 C = Router("C")
 D = Router("D")
 
-A.add_neighbor(B, 1)
+A.add_neighbor(B, 3)
 A.add_neighbor(C, 5)
-B.add_neighbor(A, 1)
-B.add_neighbor(C, 2)
-B.add_neighbor(D, 4)
-C.add_neighbor(A, 5)
-C.add_neighbor(B, 2)
-C.add_neighbor(D, 1)
+B.add_neighbor(A, 7)
+B.add_neighbor(C, 8)
+B.add_neighbor(D, 3)
+C.add_neighbor(A, 2)
+C.add_neighbor(B, 5)
+C.add_neighbor(D, 2)
 D.add_neighbor(B, 4)
 D.add_neighbor(C, 1)
 
