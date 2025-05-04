@@ -3,7 +3,7 @@ import heapq
 class LSRouter:
     def __init__(self, name):
         self.name = name
-        self.links = {}  # neighbor_name: cost
+        self.links = {} 
 
     def add_link(self, neighbor_name, cost):
         self.links[neighbor_name] = cost
@@ -39,7 +39,7 @@ class LSRouter:
             print("  To", dest, "cost:", distances[dest], "path:", " -> ".join(path))
         print()
 
-# Network Setup
+
 network = {
     'A': LSRouter('A'),
     'B': LSRouter('B'),
