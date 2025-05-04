@@ -1,0 +1,67 @@
+# Create NS Simulator
+set ns [new Simulator]
+# Enable Tracing
+set nf [open bus_topology.nam w]
+$ns namtrace-all $nf
+set tf [open bus_topology.tr w]
+$ns trace-all $tf
+# Define nodes
+set n0 [$ns node]
+set n1 [$ns node]
+# Create a shared link (bus topology simulation)
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+# Set Queue Size
+$ns queue-limit $n0 $n1 50
+# Define a TCP connection
+set tcp [new Agent/TCP]
+$ns attach-agent $n0 $tcp
+set sink [new Agent/TCPSink]
+$ns attach-agent $n1 $sink
+$ns connect $tcp $sink
+# Set up CBR (Constant Bit Rate) Traffic
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 512
+$cbr set rate_ 100Kb
+$cbr attach-agent $tcp
+# Start Traffic
+$ns at 0.1 "$cbr start"
+
+$ns at 99.9 "$cbr stop"
+# Schedule throughput calculation every second (1 to 100)
+for {set t 1} {$t <= 100} {incr t} {
+$ns at $t "calculate_throughput $t"
+}
+$ns at 101.0 "finish"
+# Procedure to Calculate Throughput Per Second
+proc calculate_throughput {time} {
+global tf
+set received_bytes 0
+# Open the trace file
+set file [open bus_topology.tr r]
+while {[gets $file line] != -1} {
+set data [split $line]
+set event [lindex $data 0]
+set pkt_time [lindex $data 1]
+# Ensure the packet has enough fields (avoid empty size)
+if {[llength $data] >= 6 && $event == "r" && $pkt_time >= $time-1 && $pkt_time < $time} {
+set size [lindex $data 5]
+set received_bytes [expr $received_bytes + $size]
+}
+}
+close $file
+# Convert bytes to bits and calculate throughput in Kbps
+set throughput [expr ($received_bytes * 8) / 1000.0]
+puts "$time $throughput"
+}
+# Define Finish Procedure
+proc finish {} {
+global ns nf tf
+$ns flush-trace
+close $nf
+close $tf
+exec nam bus_topology.nam &
+exit 0
+}
+
+# Run Simulation
+$ns run
